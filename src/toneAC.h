@@ -93,6 +93,7 @@ to control a two-pin dual LED).
   #define NOTONEAC 0
   #define PLAY_FOREVER 0
 
+  void wavAC(unsigned char* data = NULL, unsigned int length = 0);
   void toneAC(unsigned long frequency = NOTONEAC, uint8_t volume = 10, unsigned long length = PLAY_FOREVER, uint8_t background = false);
   void noToneAC();
 #endif
