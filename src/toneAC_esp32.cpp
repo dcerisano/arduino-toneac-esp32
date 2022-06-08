@@ -24,9 +24,10 @@ static void IRAM_ATTR onPCM();
 
 static std::once_flag _tAC_init;
 
-unsigned char*  _pcm_data   = NULL;
-unsigned int    _pcm_length = 0;
-unsigned int    _pcm_index  = 0;
+volatile unsigned char*   _pcm_data    = NULL;
+volatile unsigned int     _pcm_length  = 0;
+volatile unsigned int     _pcm_index   = 0;
+volatile          bool    _pcm_playing = false;
 
 void toneAC_init() {
 	std::call_once(_tAC_init, [](){
@@ -42,12 +43,12 @@ void toneAC_init() {
 		mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
 		mcpwm_deadtime_enable(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_ACTIVE_HIGH_COMPLIMENT_MODE, 0, 0);
 		mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
-		// Initialize timer
-		_tAC_timer = timerBegin(0, ESP.getCpuFreqMHz(), true);
-		timerAttachInterrupt(_tAC_timer, &onTimer, true);
 
-		_tAC_pcm = timerBegin(1, ESP.getCpuFreqMHz(), true);
-		timerAttachInterrupt(_tAC_pcm, &onPCM, true);
+		// Calibrate timers to microseconds (1,000,000 ticks per second)
+		_tAC_timer = timerBegin(0, ESP.getCpuFreqMHz(), true);
+		_tAC_pcm   = timerBegin(1, ESP.getCpuFreqMHz(), true);
+		timerAttachInterrupt(_tAC_timer, &onTimer, true);
+		timerAttachInterrupt(_tAC_pcm,   &onPCM,   true);
 	});
 }
 
@@ -63,35 +64,32 @@ void toneAC_playNote(unsigned long frequency, uint8_t volume) {
 	mcpwm_start(MCPWM_UNIT_0, MCPWM_TIMER_0);
 }
 
-void toneAC_playWAV(unsigned char* data, unsigned int length) {
-	_pcm_data      = data;
-	_pcm_length    = length;
-	_pcm_index = 0;
+void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate, uint8_t background) {
 
+	if (_pcm_playing) return;
+
+	_pcm_playing = true;
+
+	//TODO: pass resonant freq and bitrate
+
+	_pcm_data   = data;
+	_pcm_length = size;
+	_pcm_index  = 0;
+
+	//This is to eliminate 10Hz buzz  (attach pins when MCPWM not idle - detached in noToneC below)
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCPWM0APIN);
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, MCPWM0BPIN);
 
-	mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 15000); //common resonant freq
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
+	mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, resonant_freq); //common resonant freq
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
 	mcpwm_start(MCPWM_UNIT_0, MCPWM_TIMER_0);
 
-	timerAlarmWrite(_tAC_pcm, 20, true); //
+	timerAlarmWrite(_tAC_pcm, rate, true);
 	timerRestart(_tAC_pcm);
 	timerAlarmEnable(_tAC_pcm);
-}
 
-static void IRAM_ATTR onPCM() {
-	if (_pcm_index >= _pcm_length){
-		noToneAC();
-	}
-
-	float duty =  ((float)_pcm_data[_pcm_index])*0.39;
-
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
-
-    _pcm_index++;
+	while (!background && _pcm_playing);
 }
 
 
@@ -99,8 +97,6 @@ void noToneAC() {
 	timerAlarmDisable(_tAC_timer);
 	timerAlarmDisable(_tAC_pcm);
 	mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
-	gpio_reset_pin((gpio_num_t)MCPWM0APIN);
-	gpio_reset_pin((gpio_num_t)MCPWM0BPIN);
 }
 
 void noToneAC_setTimer(unsigned long delay) {
@@ -113,5 +109,38 @@ static void IRAM_ATTR onTimer() {
 	noToneAC();
 }
 
+uint32_t cp0_regs[18];
+
+static void IRAM_ATTR onPCM() {
+
+	// FPU state must be restored or it panics.
+	// Save FPU state
+	xthal_set_cpenable(1);
+	xthal_save_cp0(cp0_regs);
+
+	//Stream 8-bit PCM data.
+	//TODO - provide composite buffer for concurrent sounds.
+
+	if (_pcm_index >= _pcm_length){
+
+		noToneAC();
+		//This is to eliminate 10Hz buzz (detach pins when MCPWM is idle)
+		gpio_reset_pin((gpio_num_t)MCPWM0APIN);
+		gpio_reset_pin((gpio_num_t)MCPWM0BPIN);
+
+		_pcm_playing = false;
+	}
+
+	double duty =  ((double)_pcm_data[_pcm_index])*(double)0.39; // convert pcm hex data (0-255) to duty (0-100%).
+
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
+
+	_pcm_index++;
+
+	// Restore FPU state
+	xthal_restore_cp0(cp0_regs);
+	xthal_set_cpenable(0);
+}
 
 #endif

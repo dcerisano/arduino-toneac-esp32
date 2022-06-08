@@ -18,6 +18,6 @@ See "toneAC.h" for purpose, syntax, version history, links, and more.
 
   void toneAC_init();
   void toneAC_playNote(unsigned long frequency, uint8_t volume);
-  void toneAC_playWAV(unsigned char* data, unsigned int length);
+  void toneAC_playWAV(unsigned char* data, unsigned long size,  unsigned long resonant_freq, unsigned long rate, uint8_t background);
   void noToneAC_setTimer(unsigned long delay);
 #endif

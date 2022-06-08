@@ -90,10 +90,14 @@ to control a two-pin dual LED).
     #include <WProgram.h>
   #endif
 
-  #define NOTONEAC 0
-  #define PLAY_FOREVER 0
+  #define NOTONEAC      0
+  #define PLAY_FOREVER  0
+  #define RATE_8KHZ     40
+  #define RATE_16KHZ    20
+  #define RESONANT_FREQ 20000
 
-  void wavAC(unsigned char* data = NULL, unsigned int length = 0);
+
+  void wavAC(unsigned char* data = NULL, unsigned long size = 0, unsigned long resonant_freq = RESONANT_FREQ, unsigned long rate = RATE_16KHZ, uint8_t background = false);
   void toneAC(unsigned long frequency = NOTONEAC, uint8_t volume = 10, unsigned long length = PLAY_FOREVER, uint8_t background = false);
   void noToneAC();
 #endif

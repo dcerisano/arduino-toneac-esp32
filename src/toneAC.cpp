@@ -24,7 +24,7 @@ void toneAC(unsigned long frequency, uint8_t volume, unsigned long length, uint8
     noToneAC();
   }
 }
-void wavAC(unsigned char* data, unsigned int length) {
+void wavAC(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate, uint8_t background) {
   toneAC_init();
-  toneAC_playWAV(data, length);
+  toneAC_playWAV(data, size, resonant_freq, rate, background);
 }
