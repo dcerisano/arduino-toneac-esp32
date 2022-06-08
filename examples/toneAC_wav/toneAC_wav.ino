@@ -25,10 +25,10 @@ void loop() {
   // This is a conversation bewtween two famous computers ...
   
   // Play sound effect (non-blocking)
-  wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_8KHZ, false);
+  wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_8KHZ, true);
 
   // Pause to let the effect play ...
-  delay(800);
+  delay(1500);
   
   // Say something (blocking) ...
   wavAC(tos_data_wav, tos_data_wav_len, RESONANT_FREQ, RATE_16KHZ, false);
@@ -36,7 +36,7 @@ void loop() {
   // Short pause ...
   delay(300);
   
-  //Play some beep-boops ...
+  //Play some beep-boops (non-blocking) ...
   for (int i = 0; i < 10; i++)
   {
     toneAC(random(5000) + 1000, 9);

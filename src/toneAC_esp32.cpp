@@ -89,7 +89,10 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	timerRestart(_tAC_pcm);
 	timerAlarmEnable(_tAC_pcm);
 
+	//block if not playing background
 	while (!background && _pcm_playing);
+
+	_pcm_playing = false;
 }
 
 
