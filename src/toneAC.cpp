@@ -8,7 +8,7 @@ See "toneAC.h" for purpose, syntax, version history, links, and more.
 #include "toneAC.h"
 #include "toneAC_internal.h"
 
-void toneAC(unsigned long frequency, uint8_t volume, unsigned long length, uint8_t background) {
+void toneAC(unsigned long frequency, uint8_t volume, unsigned long length) {
   toneAC_init();
   if (frequency == NOTONEAC || volume == 0) { noToneAC(); return; } // If frequency or volume are 0, turn off sound and return.
   if (volume > 10) volume = 10;       // Make sure volume is in range (1 to 10).
@@ -17,15 +17,9 @@ void toneAC(unsigned long frequency, uint8_t volume, unsigned long length, uint8
 
   if (length == PLAY_FOREVER) return; // If length is zero, play note forever.
 
-  if (background) {                   // Background tone playing, returns control to your sketch.
-    noToneAC_setTimer(length);
-  } else {
-    delay(length);                    // Just a simple delay, doesn't return control till finished.
-    noToneAC();
-  }
 }
-void wavAC(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate, uint8_t background) {
+void wavAC(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
   toneAC_init();
-  toneAC_playWAV(data, size, resonant_freq, rate, background);
-  noToneAC();
+  toneAC_playWAV(data, size, resonant_freq, rate);
+  //noToneAC();
 }
