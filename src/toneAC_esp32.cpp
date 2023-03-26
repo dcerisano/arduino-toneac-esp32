@@ -16,8 +16,8 @@ See "toneAC.h" for purpose, syntax, version history, links, and more.
 #define MCPWM0APIN 25
 #define MCPWM0BPIN 26
 
-static hw_timer_t *_tAC_timer = NULL;
-static void IRAM_ATTR onTimer();
+//static hw_timer_t *_tAC_timer = NULL;
+//static void IRAM_ATTR onTimer();
 
 static hw_timer_t *_tAC_pcm = NULL;
 static void IRAM_ATTR onPCM();
@@ -45,9 +45,9 @@ void toneAC_init() {
 		mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
 
 		// Calibrate timers to microseconds (1,000,000 ticks per second)
-		_tAC_timer = timerBegin(0, ESP.getCpuFreqMHz(), true);
+		//_tAC_timer = timerBegin(0, ESP.getCpuFreqMHz(), true);
 		_tAC_pcm   = timerBegin(1, ESP.getCpuFreqMHz(), true);
-		timerAttachInterrupt(_tAC_timer, &onTimer, true);
+		//timerAttachInterrupt(_tAC_timer, &onTimer, true);
 		timerAttachInterrupt(_tAC_pcm,   &onPCM,   true);
 	});
 }
@@ -97,16 +97,16 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 
 
 void noToneAC() {
-	timerAlarmDisable(_tAC_timer);
+	//timerAlarmDisable(_tAC_timer);
 	timerAlarmDisable(_tAC_pcm);
 	mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
 }
 
-void noToneAC_setTimer(unsigned long delay) {
-	timerAlarmWrite(_tAC_timer, delay * 1000, false);
-	timerRestart(_tAC_timer);
-	timerAlarmEnable(_tAC_timer);
-}
+//void noToneAC_setTimer(unsigned long delay) {
+//	timerAlarmWrite(_tAC_timer, delay * 1000, false);
+//	timerRestart(_tAC_timer);
+//	timerAlarmEnable(_tAC_timer);
+//}
 
 static void IRAM_ATTR onTimer() {
 	noToneAC();
