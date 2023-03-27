@@ -36,13 +36,15 @@ void toneAC_init() {
 		pwm_config.cmpr_a = 0.0;
 		pwm_config.cmpr_b = 0.0;
 		pwm_config.counter_mode = MCPWM_UP_COUNTER;
-		pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
+		pwm_config.duty_mode = MCPWM_DUTY_MODE_1;
 		mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
-		mcpwm_deadtime_enable(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_ACTIVE_HIGH_COMPLIMENT_MODE, 0, 0);
+		mcpwm_deadtime_enable(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_ACTIVE_LOW_COMPLIMENT_MODE, 0, 0);
 		mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
 
-		_tAC_pcm   = timerBegin(1, ESP.getCpuFreqMHz(), true);
+		_tAC_pcm   = timerBegin(0, ESP.getCpuFreqMHz(), true);
 		timerAttachInterrupt(_tAC_pcm,   &onPCM,   true);
+
+
 	});
 }
 
@@ -62,8 +64,6 @@ void toneAC_playNote(unsigned long frequency, uint8_t volume) {
 
 void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
 
-	//noToneAC();
-
 	//TODO: pass resonant freq and bitrate
 
 	_pcm_data   = data;
@@ -75,26 +75,30 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, MCPWM0BPIN);
 
 	mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, resonant_freq); //common resonant freq
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
 	mcpwm_start(MCPWM_UNIT_0, MCPWM_TIMER_0);
 
 	timerAlarmWrite(_tAC_pcm, rate, true);
 	timerRestart(_tAC_pcm);
 	timerAlarmEnable(_tAC_pcm);
+
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
+
+	_pcm_playing = true;
 }
 
 
 void noToneAC() {
 
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
+
+	_pcm_playing = false;
 	timerAlarmDisable(_tAC_pcm);
 	mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
+
 }
 
-
-static void IRAM_ATTR onTimer() {
-	noToneAC();
-}
 
 uint32_t cp0_regs[18];
 
@@ -104,6 +108,7 @@ static void IRAM_ATTR onPCM() {
 	// Save FPU state
 	xthal_set_cpenable(1);
 	xthal_save_cp0(cp0_regs);
+
 
 	//Stream 8-bit PCM data.
 	//TODO - provide composite buffer for concurrent sounds.
@@ -115,15 +120,18 @@ static void IRAM_ATTR onPCM() {
 		gpio_reset_pin((gpio_num_t)MCPWM0APIN);
 		gpio_reset_pin((gpio_num_t)MCPWM0BPIN);
 
-		_pcm_playing = false;
 	}
 
-	double duty =  ((double)_pcm_data[_pcm_index])*(double)0.39; // convert pcm hex data (0-255) to duty (0-100%).
+	if (_pcm_playing){
 
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
+		uint8_t  d = _pcm_data[_pcm_index];
+		double duty =  ((double)d)/255.0*100.0;
 
-	_pcm_index++;
+		mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
+		mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
+
+		_pcm_index++;
+	}
 
 	// Restore FPU state
 	xthal_restore_cp0(cp0_regs);

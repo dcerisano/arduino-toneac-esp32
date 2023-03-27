@@ -9,7 +9,7 @@
 // While you *can* play wavs and tones at the same time, the result is predictably not great.
 
 #include "tos_intercom.h";
-#include "tos_data.h"
+
 #include "tos_working.h"
 
 #include <toneAC.h>
@@ -25,28 +25,23 @@ void loop() {
   // This is a conversation bewtween two famous computers ...
   
   // Play sound effect (non-blocking)
-  wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_8KHZ);
+  wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_16KHZ);
 
   // Pause to let the effect play ...
   delay(1200);
   
-  // Say something (blocking) ...
-  wavAC(tos_data_wav, tos_data_wav_len, RESONANT_FREQ, RATE_16KHZ);
-
-  // Short pause ...
-  delay(2000);
-  
   //Play some beep-boops (non-blocking) ...
   for (int i = 0; i < 10; i++)
   {
-    toneAC(random(5000) + 1000, 9);
+    toneAC(random(2000) + 2000, 5);
     delay(100);
     noToneAC();
   }
 
+  delay(200);
 
   // Say something (non-blocking) ...
-  wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_8KHZ);
+  wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_16KHZ);
 
   // Long pause, and loop.
   delay(1000);
