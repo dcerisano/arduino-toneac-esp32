@@ -85,6 +85,10 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
 
 	_pcm_playing = true;
+
+	while(_pcm_index < _pcm_length)
+	{
+	}
 }
 
 

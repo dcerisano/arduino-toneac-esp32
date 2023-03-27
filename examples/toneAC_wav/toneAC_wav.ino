@@ -11,6 +11,8 @@
 #include "tos_intercom.h";
 
 #include "tos_working.h"
+#include "connected.h"
+#include "disconnected.h"
 
 #include <toneAC.h>
 
@@ -23,7 +25,12 @@ void setup() {
 void loop() {
 
   // This is a conversation bewtween two famous computers ...
-  
+
+
+  wavAC(connected_wav, connected_wav_len, RESONANT_FREQ, RATE_16KHZ);
+    delay(2000);
+  wavAC(disconnected_wav, disconnected_wav_len, RESONANT_FREQ, RATE_16KHZ);
+    delay(2000);
   // Play sound effect (non-blocking)
   wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_16KHZ);
 
