@@ -91,7 +91,6 @@ to control a two-pin dual LED).
   #endif
 
   #define NOTONEAC      0
-  #define PLAY_FOREVER  0
   #define RATE_8KHZ     40
   #define RATE_16KHZ    20
   #define RATE_32KHZ    10
