@@ -81,21 +81,23 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	timerRestart(_tAC_pcm);
 	timerAlarmEnable(_tAC_pcm);
 
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 50);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 50);
 
 	_pcm_playing = true;
 
 	while(_pcm_index < _pcm_length)
 	{
 	}
+
+	noToneAC();
 }
 
 
 void noToneAC() {
 
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 100);
-	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 100);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 50);
+	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 50);
 
 	_pcm_playing = false;
 	timerAlarmDisable(_tAC_pcm);
