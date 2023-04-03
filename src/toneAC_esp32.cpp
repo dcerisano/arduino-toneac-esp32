@@ -49,7 +49,7 @@ void toneAC_init() {
 }
 
 void toneAC_playNote(unsigned long frequency, uint8_t volume) {
-	float duty = 100.0 / _tAC_volume[volume - 1];
+	float duty =  (_tAC_volume[volume - 1]/255)*100;
 
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCPWM0APIN);
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, MCPWM0BPIN);
@@ -115,6 +115,7 @@ void noToneAC() {
 
 uint32_t cp0_regs[18];
 
+
 static void IRAM_ATTR onPCM() {
 
 	// FPU state must be restored or it panics.
@@ -126,6 +127,7 @@ static void IRAM_ATTR onPCM() {
 
 	//Stream 8-bit PCM data.
 	//TODO - provide composite buffer for concurrent sounds.
+
 
 	if (_pcm_index >= _pcm_length){
 
