@@ -100,4 +100,6 @@ to control a two-pin dual LED).
   void wavAC(unsigned char* data = NULL, unsigned long size = 0, unsigned long resonant_freq = RESONANT_FREQ, unsigned long rate = RATE_16KHZ);
   void toneAC(unsigned long frequency = NOTONEAC, uint8_t volume = 10);
   void noToneAC();
+  unsigned char getPCM();
+
 #endif

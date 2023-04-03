@@ -93,6 +93,13 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	noToneAC();
 }
 
+unsigned char get_pcm()
+{
+	if (_pcm_playing)
+		return _pcm_data[_pcm_index];
+	else
+		return 0;
+}
 
 void noToneAC() {
 

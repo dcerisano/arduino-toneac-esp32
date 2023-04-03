@@ -19,3 +19,7 @@ void wavAC(unsigned char* data, unsigned long size, unsigned long resonant_freq,
   toneAC_init();
   toneAC_playWAV(data, size, resonant_freq, rate);
 }
+
+unsigned char getPCM(){
+	return get_pcm();
+}
