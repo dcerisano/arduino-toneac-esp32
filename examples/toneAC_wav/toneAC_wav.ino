@@ -11,6 +11,7 @@
 #include "tos_intercom.h";
 
 #include "tos_working.h"
+#include "tos_data.h"
 #include "connected.h"
 #include "disconnected.h"
 
@@ -26,29 +27,18 @@ void loop() {
 
   // This is a conversation bewtween two famous computers ...
 
-
-  wavAC(connected_wav, connected_wav_len, RESONANT_FREQ, RATE_16KHZ);
-    delay(2000);
-  wavAC(disconnected_wav, disconnected_wav_len, RESONANT_FREQ, RATE_16KHZ);
-    delay(2000);
-  // Play sound effect (non-blocking)
   wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_16KHZ);
-
-  // Pause to let the effect play ...
-  delay(1200);
-  
-  //Play some beep-boops (non-blocking) ...
+  wavAC(tos_data_wav, tos_data_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  wavAC(connected_wav, connected_wav_len, RESONANT_FREQ, RATE_16KHZ);
   for (int i = 0; i < 10; i++)
   {
-    toneAC(random(2000) + 2000, 5);
+    toneAC(random(2000) + 2000, 10);
     delay(100);
     noToneAC();
   }
-
-  delay(200);
-
-  // Say something (non-blocking) ...
-  wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  
+  wavAC(disconnected_wav, disconnected_wav_len, RESONANT_FREQ, RATE_16KHZ);
 
   // Long pause, and loop.
   delay(1000);
