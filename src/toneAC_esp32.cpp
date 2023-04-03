@@ -68,7 +68,7 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 
 	_pcm_data   = data;
 	_pcm_length = size;
-	_pcm_index  = 0;
+	_pcm_index  = 45;
 
 	//This is to eliminate 10Hz buzz  (attach pins when MCPWM not idle - detached in noToneC below)
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCPWM0APIN);
