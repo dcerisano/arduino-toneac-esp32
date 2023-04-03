@@ -139,7 +139,9 @@ static void IRAM_ATTR onPCM() {
 	if (_pcm_playing){
 
 		uint8_t  d = _pcm_data[_pcm_index];
+
 		double duty =  ((double)d)/255.0*100.0;
+
 
 		mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
 		mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
