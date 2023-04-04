@@ -49,7 +49,7 @@ void toneAC_init() {
 }
 
 void toneAC_playNote(unsigned long frequency, uint8_t volume) {
-	float duty =  (_tAC_volume[volume - 1]/255)*100;
+	float duty =  (_tAC_volume[volume - 1]/255.0)*100.0;
 
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCPWM0APIN);
 	mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, MCPWM0BPIN);

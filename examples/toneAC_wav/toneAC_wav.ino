@@ -8,12 +8,12 @@
 // Even at 16KHZ, speech quality is not great but wav sound effects are ok.
 // While you *can* play wavs and tones at the same time, the result is predictably not great.
 
-#include "tos_intercom.h";
-
-#include "tos_working.h"
-#include "tos_data.h"
-#include "connected.h"
-#include "disconnected.h"
+#include "theme.h"
+//#include "tos_intercom.h";
+//#include "tos_working.h"
+//#include "tos_data.h"
+//#include "connected.h"
+//#include "disconnected.h"
 
 #include <toneAC.h>
 
@@ -27,18 +27,19 @@ void loop() {
 
   // This is a conversation bewtween two famous computers ...
 
-  wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_16KHZ);
-  wavAC(tos_data_wav, tos_data_wav_len, RESONANT_FREQ, RATE_16KHZ);
-  wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_16KHZ);
-  wavAC(connected_wav, connected_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  //wavAC(tos_intercom_wav, tos_intercom_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  //wavAC(tos_data_wav, tos_data_wav_len, RESONANT_FREQ, RATE_32KHZ);
+  //wavAC(tos_working_wav, tos_working_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  //wavAC(connected_wav, connected_wav_len, RESONANT_FREQ, RATE_16KHZ);
   for (int i = 0; i < 10; i++)
-  {
-    toneAC(random(2000) + 2000, 10);
-    delay(100);
-    noToneAC();
-  }
+//  {
+//    toneAC(random(2000) + 2000, 5);
+//    delay(100);
+//    noToneAC();
+//  }
   
-  wavAC(disconnected_wav, disconnected_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  wavAC(theme_wav, theme_wav_len, RESONANT_FREQ, RATE_16KHZ);
+  // wavAC(disconnected_wav, disconnected_wav_len, RESONANT_FREQ, RATE_16KHZ);
 
   // Long pause, and loop.
   delay(1000);
