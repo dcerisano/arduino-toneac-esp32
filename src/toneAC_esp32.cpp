@@ -41,7 +41,7 @@ void toneAC_init() {
 		mcpwm_deadtime_enable(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_ACTIVE_LOW_COMPLIMENT_MODE, 0, 0);
 		mcpwm_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
 
-		_tAC_pcm   = timerBegin(0, ESP.getCpuFreqMHz(), true);
+		_tAC_pcm   = timerBegin(1, ESP.getCpuFreqMHz(), true);
 		timerAttachInterrupt(_tAC_pcm,   &onPCM,   true);
 
 
@@ -85,12 +85,6 @@ void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long reson
 	mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 50);
 
 	_pcm_playing = true;
-
-	while(_pcm_index < _pcm_length)
-	{
-	}
-
-	noToneAC();
 }
 
 unsigned char get_pcm()
