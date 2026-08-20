@@ -15,7 +15,7 @@ void toneAC(unsigned long frequency, uint8_t volume) {
 
   toneAC_playNote(frequency, volume); // Routine that plays the note using timers.
 }
-void wavAC(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
+void wavAC(const unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
   toneAC_init();
   toneAC_playWAV(data, size, resonant_freq, rate);
 }

@@ -21,7 +21,7 @@ static void IRAM_ATTR onPCM();
 
 static std::once_flag _tAC_init;
 
-volatile unsigned char*   _pcm_data    = NULL;
+const volatile unsigned char* _pcm_data = NULL;
 volatile unsigned int     _pcm_length  = 0;
 volatile unsigned int     _pcm_index   = 0;
 volatile          bool    _pcm_playing = false;
@@ -62,7 +62,7 @@ void toneAC_playNote(unsigned long frequency, uint8_t volume) {
 
 
 
-void toneAC_playWAV(unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
+void toneAC_playWAV(const unsigned char* data, unsigned long size, unsigned long resonant_freq, unsigned long rate) {
 
 	//TODO: pass resonant freq and bitrate
 
